@@ -9,11 +9,11 @@ on mac (in and out) and pypm on win32
 """
 
 import sys
+import CoreMIDI
 if sys.platform == "darwin":
-    import CoreMIDI
     device = CoreMIDI
     def tick(): pass
-    
+
 elif sys.platform == "win32":
     import pypm
     pypm.Initialize()
@@ -32,11 +32,10 @@ elif sys.platform == "win32":
                 self.pyCallback((a,b,c))
                 if self.echo:
                     self.send(a,b,c)
-                
+
         def send(self, a, b, c):
             self.outd.WriteShort(a,b,c)
     device = PyPortMidiDevice()
     def tick(): device.tick()
 else:
     raise ImportError("anymidi does not yet support this platform")
-

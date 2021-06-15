@@ -1,5 +1,5 @@
-from midi.MidiOutStream import MidiOutStream
-from midi.MidiInFile import MidiInFile
+from MidiOutStream import MidiOutStream
+from MidiInFile import MidiInFile
 from keyboard import PRESS, HOLD, UNPRESSED, Keyboard
 import keyboard
 import logging
@@ -30,8 +30,8 @@ class ScoreBuilder(MidiOutStream):
 
     def update_time(self, new_time=0, relative=1):
         #print ("new_time:         %s" % new_time)
-        
-        
+
+
         MidiOutStream.update_time(self, new_time, relative)
         if self._absolute_time != self._last_time:
             diff = self._absolute_time - self._last_time
@@ -43,9 +43,9 @@ class ScoreBuilder(MidiOutStream):
             for tick in range((diff/eighth_note)-1):
                 #print keyboard.format(self._last_status)
                 self.score.append(self._last_status)
-            
+
             self._last_time = self._absolute_time
-            
+
 
 def buildScore(in_file):
     event_handler = ScoreBuilder()

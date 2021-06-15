@@ -24,7 +24,7 @@ class Rectangle(object):
         return self.__class__(w, h, color, x, y)
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, pygame.Rect(*self.rect))
-        
+
 
 class WhiteKey(Rectangle):
     def draw(self, surface):
@@ -43,7 +43,7 @@ class BlackKey(Rectangle):
 
 
 def keyClass(keyNum):
-    if keyNum % 12 in (1, 3, 6, 8, 10):
+    if keyNum % 12 in (2, 7, 9, 11):
         return BlackKey
     else:
         return WhiteKey
@@ -79,4 +79,3 @@ while pygame.event.poll().type != pygame.QUIT:
     pygame.time.delay(10)
 
 pygame.display.quit()
-

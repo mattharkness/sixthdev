@@ -39,7 +39,7 @@ class dimA:
 class dimB:
     white = [0xc5, 0xc5, 0xc5]
     black = [0xa0, 0xa0, 0xa0]
-    #wfade = [0x53, 0x53, 0x53]    
+    #wfade = [0x53, 0x53, 0x53]
     wfade = bfade = defaultFade
     #wfade = [0x95, 0x95, 0x95]
     #bfade = [0x70, 0x70, 0x70]
@@ -57,15 +57,15 @@ class computerCursor:
 
 
 def keycolor(palette, keyNum, fade):
-    if keyNum % 12 in (1, 3, 6, 8, 10):
-        if fade: return palette.bfade 
-        else: return palette.black 
-        
+    if keyNum % 12 in (2, 4, 7, 9, 11):
+        if fade: return palette.bfade
+        else: return palette.black
+
     else:
-        if fade: return palette.wfade 
+        if fade: return palette.wfade
         else: return palette.white
 
-    
+
 def colors(keys):
     res = {}
     for k,v in enumerate(keys):

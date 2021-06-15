@@ -12,9 +12,9 @@ cdef extern from "CoreAudio/AudioHardware.h":
     ctypedef int Byte
     ctypedef unsigned int UInt16
     ctypedef unsigned int UInt32
-    ctypedef unsigned long UInt64    
+    ctypedef unsigned long UInt64
     ctypedef signed int SInt32
-    ctypedef signed long SInt64    
+    ctypedef signed long SInt64
     ctypedef unsigned int OSStatus
     ctypedef int ByteCount #@TODO: ???
 
@@ -35,7 +35,7 @@ cdef extern from "Python.h":
 
 
 ###########################################################
-   
+
 cdef extern from "CoreMIDI/MIDIServices.h":
 
     ctypedef void* MIDIObjectRef
@@ -51,7 +51,7 @@ cdef extern from "CoreMIDI/MIDIServices.h":
 
     ctypedef struct MIDIEntityRef:
         void* MIDIEntityRef
-        
+
     ctypedef struct MIDIEndpointRef:
         void* OpaqueMIDIEndpoint
 
@@ -65,7 +65,7 @@ cdef extern from "CoreMIDI/MIDIServices.h":
 #        void* MIDINotification
 
     #--------
-    
+
     ctypedef UInt64 MIDITimeStamp
 
     ctypedef struct MIDIPacket:
@@ -84,7 +84,7 @@ cdef extern from "CoreMIDI/MIDIServices.h":
         MIDINotificationMessageID       messageID
         ByteCount                       messageSize
         # additional data may follow, depending on messageID
-        
+
     cdef enum:
         kMIDIObjectType_Other                   = -1
         kMIDIObjectType_Device                  = 0
@@ -97,7 +97,7 @@ cdef extern from "CoreMIDI/MIDIServices.h":
         kMIDIObjectType_ExternalEntity          = kMIDIObjectType_ExternalMask | kMIDIObjectType_Entity
         kMIDIObjectType_ExternalSource          = kMIDIObjectType_ExternalMask | kMIDIObjectType_Source
         kMIDIObjectType_ExternalDestination     = kMIDIObjectType_ExternalMask | kMIDIObjectType_Destination
-    
+
 
     ctypedef SInt32 MIDIObjectType
     ctypedef SInt32 MIDIUniqueID
@@ -119,7 +119,7 @@ cdef extern from "CoreMIDI/MIDIServices.h":
         Byte                reserved[3]
         MIDICompletionProc  completionProc
         void *              completionRefCon
-    
+
 
 
     cdef enum:
@@ -133,24 +133,24 @@ cdef extern from "CoreMIDI/MIDIServices.h":
 
 
     ##############################
-        
+
     OSStatus MIDIClientCreate(
         CFStringRef name,
         MIDINotifyProc notifyProc,
         void* notifyRefCon,
-        MIDIClientRef* outClient)  
+        MIDIClientRef* outClient)
 
 
     OSStatus MIDIInputPortCreate(
-        MIDIClientRef   client, 
-        CFStringRef     portName, 
-        MIDIReadProc    readProc, 
-        void *          refCon, 
+        MIDIClientRef   client,
+        CFStringRef     portName,
+        MIDIReadProc    readProc,
+        void *          refCon,
         MIDIPortRef *   outPort )
 
     OSStatus MIDIOutputPortCreate(
         MIDIClientRef	client,
-        CFStringRef     portName, 
+        CFStringRef     portName,
         MIDIPortRef *	outPort )
 
 
@@ -189,7 +189,7 @@ cdef CFStringRef pyCFSTR(s):
 
 ## midi send ##########################################################
 
-def send(a,b,c): 
+def send(a,b,c):
     cdef MIDIPacketList packetList
     cdef MIDIPacket* packet
     cdef Byte a_
@@ -206,43 +206,43 @@ def send(a,b,c):
     packet.data[0] = a_
     packet.data[1] = b_
     packet.data[2] = c_
-    
+
     #print "%s %s %s" % (a, b, c)
 
     MIDISend(outPort, dest, &packetList)
-    
+
 
 ## callback support ###################################################
 
 
 cdef extern from "Python.h":
-    
-    ctypedef int PyInterpreterState 
+
+    ctypedef int PyInterpreterState
     ctypedef struct PyThreadState:
         PyInterpreterState* interp
 
     void PyEval_InitThreads()
     PyThreadState* PyEval_SaveThread()
     void PyEval_RestoreThread(PyThreadState* t)
-    
+
 
     # PyThreadState* PyThreadState_New(PyInterpreterState* i)
     # PyThreadState* PyThreadState_Swap(PyThreadState* t)
     # void PyEval_AcquireThread(PyThreadState* t)
     # void PyEval_ReleaseThread(PyThreadState* t)
- 
+
     ctypedef int PyGILState_STATE
     PyGILState_STATE PyGILState_Ensure()
     void PyGILState_Release(PyGILState_STATE gstate)
-    
+
 
 ##[ TEST CODE ]################################################################
 
 cdef void _callback(MIDIPacketList* pktlist, void* refCon, void* connRefCon):
 
-    cdef PyGILState_STATE gil 
+    cdef PyGILState_STATE gil
     gil = PyGILState_Ensure()
-    
+
     # put all the objety stuff in a separate function so
     # pyrex generated refcount stuff doesn't mess us up
     # http://lists.copyleft.no/pipermail/pyrex/2004-October/000983.html
@@ -255,26 +255,26 @@ cdef void call_python_callback(MIDIPacket* packet):
     if pyCallback:
         data = []
         for i from 0 <= i < packet.length: # weird
+
             data.append(packet.data[i])
         pyCallback(data)
-    
+
 
 
 def pyCallback(data):
-    print "midi event:", data
- 
-    
+    return 0
+
 
 
 ### init module
-    
+
 cdef MIDIClientRef client
 cdef MIDIPortRef inPort
 cdef MIDIPortRef outPort
 cdef MIDIEndpointRef src
 cdef MIDIEndpointRef dest
 
-### 
+###
 cdef PyThreadState *state
 PyEval_InitThreads()
 state = PyEval_SaveThread()
